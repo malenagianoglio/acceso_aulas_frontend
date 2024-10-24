@@ -16,24 +16,6 @@ function Usuarios() {
     setUsuarios(data);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
-        method: 'DELETE',
-      });
-    
-      if (!response.ok) {
-        throw new Error('Error al eliminar el usuario: ' + response.statusText);
-      }
-
-      const updatedUsuarios = usuarios.filter((user) => user.id !== id);
-      setUsuarios(updatedUsuarios);
-    } catch (error) {
-      console.error('Error en handleDelete:', error);
-    }
-  };
-  
-
   return (
     <div className='usuario-container'>
         <div className='usuario-title'>
@@ -67,8 +49,9 @@ function Usuarios() {
                 <td>{usuario.rol}</td>
                 <td>{usuario.uid}</td>
                 <td>
-                    <Button variant="warning">Editar</Button>
-                    <Button variant="danger" onClick={() => handleDelete(usuario.id)}>Eliminar</Button>
+                <Link to={`/usuarios/${usuario.id}`}>
+                    <Button variant="outline-success">Ver</Button>
+                </Link>
                 </td>
                 </tr>
             ))}
