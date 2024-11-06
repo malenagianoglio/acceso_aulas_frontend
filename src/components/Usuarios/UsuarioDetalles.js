@@ -122,11 +122,11 @@ function UsuarioDetalles() {
             />
         </Form.Group>
 
-        <Button variant="primary" onClick={handleUpdate}>
+        <Button variant="secondary" onClick={handleUpdate}>
           Actualizar
         </Button>
 
-        <Button variant="danger" onClick={handleDelete} style={{ marginLeft: '10px' }}>
+        <Button variant="dark" onClick={handleDelete} style={{ marginLeft: '10px' }}>
           Eliminar
         </Button>
 

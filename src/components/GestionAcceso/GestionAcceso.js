@@ -5,23 +5,28 @@ import axios from 'axios';
 const AsignarEspacio = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [espacios, setEspacios] = useState([]);
+    const [permisos, setPermisos] = useState([]);
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
     const [espacioSeleccionado, setEspacioSeleccionado] = useState(null);
     const [searchUsuario, setSearchUsuario] = useState('');
     const [searchEspacio, setSearchEspacio] = useState('');
+    const [searchPermiso, setSearchPermiso] = useState('');
     const [filteredUsuarios, setFilteredUsuarios] = useState([]);
     const [filteredEspacios, setFilteredEspacios] = useState([]);
-    const [fechaFin, setFechaFin] = useState(''); // Estado para la fecha de fin
+    const [filteredPermisos, setFilteredPermisos] = useState([]);
+    const [fechaFin, setFechaFin] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [usuariosResponse, espaciosResponse] = await Promise.all([
+                const [usuariosResponse, espaciosResponse, permisosResponse] = await Promise.all([
                     axios.get('http://localhost:8080/api/usuarios'),
-                    axios.get('http://localhost:8080/api/espacios')
+                    axios.get('http://localhost:8080/api/espacios'),
+                    axios.get('http://localhost:8080/api/permisoAcceso'),
                 ]);
                 setUsuarios(usuariosResponse.data);
                 setEspacios(espaciosResponse.data);
+                setPermisos(permisosResponse.data);
             } catch (error) {
                 console.error('Error al cargar datos:', error);
             }
@@ -31,30 +36,47 @@ const AsignarEspacio = () => {
     }, []);
 
     useEffect(() => {
-        const filterUsuarios = () => {
-            if (searchUsuario) {
-                return usuarios.filter(usuario =>
+        setFilteredUsuarios(
+            searchUsuario
+                ? usuarios.filter(usuario =>
                     usuario.nombre.toLowerCase().includes(searchUsuario.toLowerCase()) ||
                     usuario.apellido.toLowerCase().includes(searchUsuario.toLowerCase()) ||
                     usuario.dni.toString().includes(searchUsuario)
-                );
-            }
-            return [];
-        };
-        setFilteredUsuarios(filterUsuarios());
+                )
+                : []
+        );
     }, [searchUsuario, usuarios]);
 
     useEffect(() => {
-        const filterEspacios = () => {
-            if (searchEspacio) {
-                return espacios.filter(espacio =>
+        setFilteredEspacios(
+            searchEspacio
+                ? espacios.filter(espacio =>
                     espacio.nombre.toLowerCase().includes(searchEspacio.toLowerCase())
-                );
-            }
-            return [];
-        };
-        setFilteredEspacios(filterEspacios());
+                )
+                : []
+        );
     }, [searchEspacio, espacios]);
+
+    useEffect(() => {
+        setFilteredPermisos(
+            searchPermiso
+                ? permisos.filter(permiso => {
+                    const [searchName, searchLastName] = searchPermiso.toLowerCase().split(" ");
+    
+                    const matchName = permiso.usuario.nombre.toString().toLowerCase().includes(searchName);
+                    const matchLastName = searchLastName
+                        ? permiso.usuario.apellido.toString().toLowerCase().includes(searchLastName)
+                        : true; 
+    
+                    const matchDni = permiso.usuario.dni.toString().includes(searchPermiso);
+                    const matchSpaceName = permiso.espacio.nombre.toString().toLowerCase().includes(searchPermiso.toLowerCase());
+    
+                    return (matchName && matchLastName) || matchDni || matchSpaceName;
+                })
+                : permisos
+        );
+    }, [searchPermiso, permisos]);
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -63,7 +85,7 @@ const AsignarEspacio = () => {
                 usuarioId: usuarioSeleccionado.id,
                 espacioId: espacioSeleccionado.id,
                 fecha_inicio: new Date(),
-                fecha_fin: fechaFin || null // Añade la fecha de fin si se proporciona
+                fecha_fin: fechaFin || null
             });
             alert('Espacio asignado exitosamente');
             resetForm();
@@ -77,125 +99,129 @@ const AsignarEspacio = () => {
         setEspacioSeleccionado(null);
         setSearchUsuario('');
         setSearchEspacio('');
-        setFechaFin(''); // Resetea la fecha de fin
+        setFechaFin('');
         setFilteredUsuarios([]);
         setFilteredEspacios([]);
     };
 
     return (
-        <Form onSubmit={handleSubmit}>
-            {/* Otros campos */}
-            <Form.Group controlId="formUsuario">
-                <Form.Label>Buscar Usuario (Nombre, Apellido o DNI)</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={searchUsuario}
-                    onChange={(e) => setSearchUsuario(e.target.value)}
-                    placeholder="Buscar usuario por nombre, apellido o DNI"
-                />
-                {filteredUsuarios.length > 0 && (
-                    <ListGroup>
-                        {filteredUsuarios.map(usuario => (
-                            <ListGroup.Item
-                                key={usuario.id}
-                                onClick={() => {
-                                    setUsuarioSeleccionado(usuario);
-                                    setSearchUsuario(`${usuario.nombre} ${usuario.apellido}`);
-                                    setFilteredUsuarios([]); // Ocultar lista
-                                }}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                {usuario.nombre} {usuario.apellido} - DNI: {usuario.dni}
-                            </ListGroup.Item>
-                        ))}
-                    </ListGroup>
-                )}
-                {usuarioSeleccionado && (
-                    <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>DNI</th>
-                                <th>Email</th>
-                                <th>Rol</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{usuarioSeleccionado.id}</td>
-                                <td>{usuarioSeleccionado.nombre}</td>
-                                <td>{usuarioSeleccionado.apellido}</td>
-                                <td>{usuarioSeleccionado.dni}</td>
-                                <td>{usuarioSeleccionado.email}</td>
-                                <td>{usuarioSeleccionado.rol}</td>
-                            </tr>
-                        </tbody>
-                    </Table>
-                )}
-            </Form.Group>
+        <div className='acceso-container'>
+            <div className='acceso-title'>
+                <h2>Gestión de accesos</h2>
+            </div>
+            <div className='acceso-subtitle'>
+                <h2>Asignación de espacios</h2>
+            </div>
+            <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="usuario">
+                    <Form.Label>Buscar Usuario</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Nombre, Apellido o DNI"
+                        value={searchUsuario}
+                        onChange={(e) => setSearchUsuario(e.target.value)}
+                    />
+                    {filteredUsuarios.length > 0 && (
+                        <ListGroup>
+                            {filteredUsuarios.map((usuario) => (
+                                <ListGroup.Item
+                                    key={usuario.id}
+                                    action
+                                    onClick={() => {
+                                        setUsuarioSeleccionado(usuario);
+                                        setSearchUsuario(`${usuario.nombre} ${usuario.apellido}`);
+                                        setFilteredUsuarios([]);
+                                    }}
+                                >
+                                    {usuario.nombre} {usuario.apellido} - DNI: {usuario.dni}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    )}
+                </Form.Group>
+                <Form.Group controlId="espacio">
+                    <Form.Label>Buscar Espacio</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Nombre del espacio"
+                        value={searchEspacio}
+                        onChange={(e) => setSearchEspacio(e.target.value)}
+                    />
+                    {filteredEspacios.length > 0 && (
+                        <ListGroup>
+                            {filteredEspacios.map((espacio) => (
+                                <ListGroup.Item
+                                    key={espacio.id}
+                                    action
+                                    onClick={() => {
+                                        setEspacioSeleccionado(espacio);
+                                        setSearchEspacio(espacio.nombre);
+                                        setFilteredEspacios([]);
+                                    }}
+                                >
+                                    {espacio.nombre}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    )}
+                </Form.Group>
+                <Form.Group controlId="fechaFin">
+                    <Form.Label>Fecha de Fin (opcional)</Form.Label>
+                    <Form.Control
+                        type="date"
+                        value={fechaFin}
+                        onChange={(e) => setFechaFin(e.target.value)}
+                    />
+                </Form.Group>
+                <Button type="submit" variant="primary">
+                    Asignar Espacio
+                </Button>
+            </Form>
 
-            <Form.Group controlId="formEspacio">
-                <Form.Label>Buscar Espacio</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={searchEspacio}
-                    onChange={(e) => setSearchEspacio(e.target.value)}
-                    placeholder="Buscar espacio por nombre"
-                />
-                {filteredEspacios.length > 0 && (
-                    <ListGroup>
-                        {filteredEspacios.map(espacio => (
-                            <ListGroup.Item
-                                key={espacio.id}
-                                onClick={() => {
-                                    setEspacioSeleccionado(espacio);
-                                    setSearchEspacio(espacio.nombre);
-                                    setFilteredEspacios([]); // Ocultar lista
-                                }}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                {espacio.nombre}
-                            </ListGroup.Item>
-                        ))}
-                    </ListGroup>
-                )}
-                {espacioSeleccionado && (
-                    <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Sector</th>
-                                <th>ID ESP8266</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{espacioSeleccionado.id}</td>
-                                <td>{espacioSeleccionado.nombre}</td>
-                                <td>{espacioSeleccionado.sector}</td>
-                                <td>{espacioSeleccionado.id_esp8266}</td>
-                            </tr>
-                        </tbody>
-                    </Table>
-                )}
-            </Form.Group>
+            <div className='gestion-permisos'>
+                <h3>Gestión de Permisos de Acceso</h3>
+                <Form.Group controlId="searchPermiso">
+                    <Form.Label>Buscar Permiso (ID de Usuario o Espacio)</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Buscar por ID de Usuario o Espacio"
+                        value={searchPermiso}
+                        onChange={(e) => setSearchPermiso(e.target.value)}
+                    />
+                </Form.Group>
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>DNI</th>
+                            <th>Rol</th>
+                            <th>Espacio</th>
+                            <th>Fecha de Inicio</th>
+                            <th>Fecha de Fin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredPermisos.map((permiso) => {
+                            const fechaInicio = permiso.permiso.fecha_inicio ? new Date(permiso.permiso.fecha_inicio).toISOString().split('T')[0] : 'N/A';
+                            const fechaFin = permiso.permiso.fecha_fin ? new Date(permiso.permiso.fecha_fin).toISOString().split('T')[0] : 'N/A';
 
-            <Form.Group controlId="formFechaFin">
-                <Form.Label>Fecha Límite de Asignación (Opcional)</Form.Label>
-                <Form.Control
-                    type="date"
-                    value={fechaFin}
-                    onChange={(e) => setFechaFin(e.target.value)}
-                />
-            </Form.Group>
-
-            <Button variant="primary" type="submit" disabled={!usuarioSeleccionado || !espacioSeleccionado}>
-                Asignar Espacio
-            </Button>
-        </Form>
+                            return (
+                                <tr key={permiso.permiso.id}>
+                                    <td>{permiso.usuario.nombre}</td>
+                                    <td>{permiso.usuario.apellido}</td>
+                                    <td>{permiso.usuario.dni}</td>
+                                    <td>{permiso.usuario.rol}</td>
+                                    <td>{permiso.espacio.nombre}</td>
+                                    <td>{fechaInicio}</td>
+                                    <td>{fechaFin}</td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </Table>
+            </div>
+        </div>
     );
 };
 

@@ -95,11 +95,11 @@ function EspacioDetalles() {
             onChange={(e) => setEspacio({ ...espacio, id_esp8266: e.target.value })}
           />
         </Form.Group>
-        <Button variant="primary" onClick={handleUpdate}>
+        <Button variant="secondary" onClick={handleUpdate}>
           Actualizar
         </Button>
 
-        <Button variant="danger" onClick={handleDelete} style={{ marginLeft: '10px' }}>
+        <Button variant="dark" onClick={handleDelete} style={{ marginLeft: '10px' }}>
           Eliminar
         </Button>
 

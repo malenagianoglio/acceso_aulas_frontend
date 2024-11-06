@@ -1,57 +1,93 @@
 .app {
-    display: flex; 
-    height: 100vh; 
-  }
-  
-  .sidebar {
-    display: flex;
-    width: 250px; 
-    background-color: #343a40; 
-    height: 100vh; 
-  }
-  
-  .main-content {
-    flex: 1; 
-    padding: 20px; 
-    background-color: #f8f9fa; 
-  }
-  
-  
-  .sidebar .navbar {
-    width: 250px; 
-  }
-  
-  .custom-nav .nav-link {
-    display: flex; 
-    align-items: center; 
-    color: #ffffff; 
-    transition: background-color 0.3s, color 0.3s; 
-  }
-  
-  .custom-nav .nav-link:hover {
-    background-color: #565656; 
-    color: #ffffff;
-  }
-  
-  .icon {
-    margin-right: 10px; 
-    font-size: 1.2em; 
-    color: #ffffff; 
-    transition: color 0.3s; 
-  }
-  
-  .custom-nav .nav-link:hover .icon {
-    color: #ffdd57; 
-  }
-  
-  .usuario-title{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
+  display: flex;
+  height: 100vh;
+  font-family: 'Arial', sans-serif;
+}
 
-  .espacios-title{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  background-color: #2c3e50;
+  height: 100vh;
+  color: #ecf0f1;
+  padding: 20px;
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  background-color: #ecf0f1;
+}
+
+.sidebar .navbar {
+  width: 100%;
+}
+
+.custom-nav .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #ecf0f1;
+  transition: background-color 0.3s, color 0.3s;
+  border-radius: 5px;
+}
+
+.custom-nav .nav-link:hover {
+  background-color: #34495e;
+  color: #ffffff;
+}
+
+.icon {
+  margin-right: 10px;
+  font-size: 1.2em;
+  color: #ffffff;
+  transition: color 0.3s;
+}
+
+.custom-nav .nav-link:hover .icon {
+  color: #3f8feb;
+}
+
+.usuario-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #34495e;
+}
+
+.usuario-title h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.table {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+  background-color: #34495e;
+  color: #ffffff;
+  text-align: center;
+}
+
+.table td, .table th {
+  padding: 15px;
+  text-align: center;
+}
+
+.Button {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  transition: background-color 0.3s;
+}
+
+.espacios-title{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

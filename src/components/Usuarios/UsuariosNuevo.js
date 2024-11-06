@@ -28,7 +28,8 @@ const UsuarioAlta = () => {
     };
 
     return (
-        <Form onSubmit={handleSubmit}>
+        <div className='formulario-nuevo'>
+            <Form onSubmit={handleSubmit}>
             <Form.Group controlId="formNombre">
                 <Form.Label>Nombre</Form.Label>
                 <Form.Control
@@ -93,10 +94,11 @@ const UsuarioAlta = () => {
                     required
                 />
             </Form.Group>
-            <Button variant="primary" type="submit">
+            <Button variant="dark" type="submit">
                 Agregar Usuario
             </Button>
         </Form>
+        </div>
     );
 };
 

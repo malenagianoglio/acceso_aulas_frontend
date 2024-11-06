@@ -64,7 +64,7 @@ const EspacioAlta = () => {
                     required
                 />
             </Form.Group>
-            <Button variant="primary" type="submit">
+            <Button variant="dark" type="submit">
                 Agregar Espacio
             </Button>
         </Form>
