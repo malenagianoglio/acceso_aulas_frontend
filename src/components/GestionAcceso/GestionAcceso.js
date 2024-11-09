@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Form, Button, ListGroup, Table } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -19,14 +20,12 @@ const AsignarEspacio = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [usuariosResponse, espaciosResponse, permisosResponse] = await Promise.all([
-                    axios.get('http://localhost:8080/api/usuarios'),
-                    axios.get('http://localhost:8080/api/espacios'),
-                    axios.get('http://localhost:8080/api/permisoAcceso'),
-                ]);
-                setUsuarios(usuariosResponse.data);
-                setEspacios(espaciosResponse.data);
-                setPermisos(permisosResponse.data);
+                const response = await axios.get('http://localhost:8080/api/permisoAcceso');
+                const data = response.data[0]; 
+                
+                setUsuarios(data.usuarios);
+                setEspacios(data.espacios);
+                setPermisos(data.permisos);
             } catch (error) {
                 console.error('Error al cargar datos:', error);
             }
@@ -39,9 +38,9 @@ const AsignarEspacio = () => {
         setFilteredUsuarios(
             searchUsuario
                 ? usuarios.filter(usuario =>
-                    usuario.nombre.toLowerCase().includes(searchUsuario.toLowerCase()) ||
-                    usuario.apellido.toLowerCase().includes(searchUsuario.toLowerCase()) ||
-                    usuario.dni.toString().includes(searchUsuario)
+                    (usuario.nombre && usuario.nombre.toLowerCase().includes(searchUsuario.toLowerCase())) ||
+                    (usuario.apellido && usuario.apellido.toLowerCase().includes(searchUsuario.toLowerCase())) ||
+                    (usuario.dni && usuario.dni.toString().includes(searchUsuario))
                 )
                 : []
         );
@@ -51,32 +50,42 @@ const AsignarEspacio = () => {
         setFilteredEspacios(
             searchEspacio
                 ? espacios.filter(espacio =>
-                    espacio.nombre.toLowerCase().includes(searchEspacio.toLowerCase())
+                    espacio.nombre && espacio.nombre.toLowerCase().includes(searchEspacio.toLowerCase())
                 )
                 : []
         );
     }, [searchEspacio, espacios]);
 
     useEffect(() => {
+        console.log("Buscando permisos:", searchPermiso);
+        console.log("Usuarios:", usuarios);
+        console.log("Espacios:", espacios);
+        console.log("Permisos:", permisos);
+   
         setFilteredPermisos(
             searchPermiso
                 ? permisos.filter(permiso => {
+                    const usuario = usuarios.find(u => u.id === permiso.usuarioId);
+                    const espacio = espacios.find(e => e.id === permiso.espacioId);
+   
+                    if (!usuario || !espacio) return false;
+   
                     const [searchName, searchLastName] = searchPermiso.toLowerCase().split(" ");
-    
-                    const matchName = permiso.usuario.nombre.toString().toLowerCase().includes(searchName);
+   
+                    const matchName = usuario.nombre?.toString().toLowerCase().includes(searchName);
                     const matchLastName = searchLastName
-                        ? permiso.usuario.apellido.toString().toLowerCase().includes(searchLastName)
-                        : true; 
-    
-                    const matchDni = permiso.usuario.dni.toString().includes(searchPermiso);
-                    const matchSpaceName = permiso.espacio.nombre.toString().toLowerCase().includes(searchPermiso.toLowerCase());
-    
+                        ? usuario.apellido?.toString().toLowerCase().includes(searchLastName)
+                        : true;
+   
+                    const matchDni = usuario.dni?.toString().includes(searchPermiso);
+                    const matchSpaceName = espacio.nombre?.toString().toLowerCase().includes(searchPermiso.toLowerCase());
+   
                     return (matchName && matchLastName) || matchDni || matchSpaceName;
                 })
                 : permisos
         );
-    }, [searchPermiso, permisos]);
-    
+    }, [searchPermiso, permisos, usuarios, espacios]);
+   
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -84,8 +93,8 @@ const AsignarEspacio = () => {
             await axios.post('http://localhost:8080/api/permisoAcceso', {
                 usuarioId: usuarioSeleccionado.id,
                 espacioId: espacioSeleccionado.id,
-                fecha_inicio: new Date(),
-                fecha_fin: fechaFin || null
+                fecha_inicio: new Date().toISOString().split('T')[0], 
+                fecha_fin: fechaFin ? new Date(fechaFin).toISOString().split('T')[0] : null 
             });
             alert('Espacio asignado exitosamente');
             resetForm();
@@ -107,10 +116,10 @@ const AsignarEspacio = () => {
     return (
         <div className='acceso-container'>
             <div className='acceso-title'>
-                <h2>Gestión de accesos</h2>
+                <h2 className='title'>Gestión de accesos</h2>
             </div>
             <div className='acceso-subtitle'>
-                <h2>Asignación de espacios</h2>
+                <h3 className='subtitle'>Asignación de espacios</h3>
             </div>
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="usuario">
@@ -173,13 +182,15 @@ const AsignarEspacio = () => {
                         onChange={(e) => setFechaFin(e.target.value)}
                     />
                 </Form.Group>
-                <Button type="submit" variant="primary">
+                <Button type="submit" variant="dark">
                     Asignar Espacio
                 </Button>
             </Form>
+            <div class="border-top my-4"></div>
+
 
             <div className='gestion-permisos'>
-                <h3>Gestión de Permisos de Acceso</h3>
+                <h3 className='subtitle'>Gestión de Permisos de Acceso</h3>
                 <Form.Group controlId="searchPermiso">
                     <Form.Label>Buscar Permiso (ID de Usuario o Espacio)</Form.Label>
                     <Form.Control
@@ -203,18 +214,26 @@ const AsignarEspacio = () => {
                     </thead>
                     <tbody>
                         {filteredPermisos.map((permiso) => {
-                            const fechaInicio = permiso.permiso.fecha_inicio ? new Date(permiso.permiso.fecha_inicio).toISOString().split('T')[0] : 'N/A';
-                            const fechaFin = permiso.permiso.fecha_fin ? new Date(permiso.permiso.fecha_fin).toISOString().split('T')[0] : 'N/A';
+                            const fechaInicio = permiso.fecha_inicio ? new Date(permiso.fecha_inicio).toISOString().split('T')[0] : 'N/A';
+                            const fechaFin = permiso.fecha_fin ? new Date(permiso.fecha_fin).toISOString().split('T')[0] : 'N/A';
+
+                            const usuario = usuarios.find(u => u.id === permiso.usuarioId);
+                            const espacio = espacios.find(e => e.id === permiso.espacioId);
 
                             return (
-                                <tr key={permiso.permiso.id}>
-                                    <td>{permiso.usuario.nombre}</td>
-                                    <td>{permiso.usuario.apellido}</td>
-                                    <td>{permiso.usuario.dni}</td>
-                                    <td>{permiso.usuario.rol}</td>
-                                    <td>{permiso.espacio.nombre}</td>
+                                <tr key={permiso.id}>
+                                    <td>{usuario?.nombre}</td>
+                                    <td>{usuario?.apellido}</td>
+                                    <td>{usuario?.dni}</td>
+                                    <td>{usuario?.rol}</td>
+                                    <td>{espacio?.nombre}</td>
                                     <td>{fechaInicio}</td>
                                     <td>{fechaFin}</td>
+                                    <td>
+                                        <Link to={`/permisoAcceso/${permiso.id}`}>
+                                            <Button variant="outline-secondary">Ver</Button>
+                                        </Link>
+                                    </td>
                                 </tr>
                             );
                         })}

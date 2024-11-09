@@ -8,6 +8,7 @@ import Espacios from './components/Espacios/Espacios';
 import EspaciosNuevo from './components/Espacios/EspaciosNuevo';
 import EspaciosDetalle from './components/Espacios/EspacioDetalles';
 import GestionAcceso from './components/GestionAcceso/GestionAcceso';
+import PermisoDetalle from './components/GestionAcceso/PermisoDetalle';
 import HistorialAcceso from './components/HistorialAccesos/HistorialAccesos';
 import './App.css';
 
@@ -21,6 +22,7 @@ function App() {
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/usuarios/nuevo" element={<UsuariosNuevo />} />
             <Route path="/usuarios/:id" element={<UsuariosDetalle />} />
+            <Route path="/permisoAcceso/:id" element={<PermisoDetalle />} />
             <Route path="/espacios" element={<Espacios />} />
             <Route path="/espacios/nuevo" element={<EspaciosNuevo/>} />
             <Route path="/espacios/:id" element={<EspaciosDetalle/>} />

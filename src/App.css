@@ -2,6 +2,14 @@
   display: flex;
   height: 100vh;
   font-family: 'Arial', sans-serif;
+  overflow: hidden; 
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  background-color: #ecf0f1;
+  overflow-y: auto; 
 }
 
 .sidebar {
@@ -9,15 +17,9 @@
   flex-direction: column;
   width: 250px;
   background-color: #2c3e50;
-  height: 100vh;
+  height: 100%;
   color: #ecf0f1;
   padding: 20px;
-}
-
-.main-content {
-  flex: 1;
-  padding: 40px;
-  background-color: #ecf0f1;
 }
 
 .sidebar .navbar {
@@ -49,17 +51,29 @@
   color: #3f8feb;
 }
 
-.usuario-title {
+.image{
+  height: 35px;
+  margin-bottom: 10px;
+  background-color: #ffffff3b;
+}
+
+.usuario-title{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  color: #34495e;
 }
 
-.usuario-title h2 {
+.title {
+  color: #34495e;
   font-size: 1.8rem;
   font-weight: bold;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  color: #34495e;
+  font-size: 1.6rem;
+  text-transform: uppercase;
 }
 
 .table {
@@ -67,6 +81,8 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  margin-bottom: 20px; /* Ajusta según sea necesario */
 }
 
 .table th {

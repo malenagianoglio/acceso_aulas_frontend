@@ -61,7 +61,7 @@ function EspacioDetalles() {
 
   return (
     <div>
-      <h2>Detalles del usuario</h2>
+      <h2 className='title'>Detalles del espacio</h2>
       <Form>
         <Form.Group controlId="formNombre">
           <Form.Label>Nombre</Form.Label>

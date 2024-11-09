@@ -22,14 +22,15 @@ function Usuarios() {
   
     return partesBusqueda.every(parte =>
       usuario.nombre.toLowerCase().includes(parte) || 
-      usuario.apellido.toLowerCase().includes(parte)
+      usuario.apellido.toLowerCase().includes(parte) ||
+      usuario.dni.toString().includes(parte)
     );
   });
 
   return (
     <div className='usuario-container'>
       <div className='usuario-title'>
-        <h2>Gestión de usuarios</h2>
+        <h2 className='title'>Gestión de usuarios</h2>
         <div className='boton-alta'>
           <Link to="/usuarios/nuevo">
             <Button variant="dark">Nuevo usuario</Button>
@@ -40,7 +41,7 @@ function Usuarios() {
         <Form.Group controlId="busqueda">
           <Form.Control
             type="text"
-            placeholder="Buscar usuario por nombre y apellido..."
+            placeholder="Buscar usuario por nombre, apellido o DNI..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="mb-3"
@@ -54,6 +55,7 @@ function Usuarios() {
               <th>ID</th>
               <th>Nombre</th>
               <th>Apellido</th>
+              <th>DNI</th>
               <th>Email</th>
               <th>Rol</th>
               <th>UID</th>
@@ -66,6 +68,7 @@ function Usuarios() {
                 <td>{usuario.id}</td>
                 <td>{usuario.nombre}</td>
                 <td>{usuario.apellido}</td>
+                <td>{usuario.dni}</td>
                 <td>{usuario.email}</td>
                 <td>{usuario.rol}</td>
                 <td>{usuario.uid}</td>

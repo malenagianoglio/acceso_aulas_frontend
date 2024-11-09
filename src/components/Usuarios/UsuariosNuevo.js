@@ -29,6 +29,7 @@ const UsuarioAlta = () => {
 
     return (
         <div className='formulario-nuevo'>
+            <h2 className='title'>Nuevo Usuario</h2>
             <Form onSubmit={handleSubmit}>
             <Form.Group controlId="formNombre">
                 <Form.Label>Nombre</Form.Label>

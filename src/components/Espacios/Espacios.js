@@ -25,7 +25,7 @@ function Espacios() {
     return (
       <div className='espacios-container'>
           <div className='espacios-title'>
-              <h2>Gestión de espacios</h2>
+              <h2 className='title'>Gestión de espacios</h2>
               <div className='boton-alta'>
                   <Link to="/espacios/nuevo">
                       <Button variant="dark">Nuevo espacio</Button>

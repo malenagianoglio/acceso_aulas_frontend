@@ -8,7 +8,7 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <Navbar bg="dark" className="flex-column custom-nav" variant="dark">
-        <Navbar.Brand href="../App.js">SISTEMA ACCESO</Navbar.Brand>
+      <img src="/logo-utn-frsf.svg" alt="UTN Logo" className='image'/>
         <Nav className="flex-column">
           <Nav.Link as={Link} to="/usuarios"><i class="bi bi-person-fill icon"></i>Usuarios</Nav.Link>
           <Nav.Link as={Link} to="/espacios"><i class="bi bi-box icon"></i>Espacios</Nav.Link>
